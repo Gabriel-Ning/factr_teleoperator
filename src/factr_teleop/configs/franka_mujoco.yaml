@@ -1,0 +1,66 @@
+name: right
+
+dynamixel:
+  # USB port name given by the command: ls /dev/serial/by-id/
+  dynamixel_port: "usb-FTDI_USB__-__Serial_Converter_FTAO51S3-if00-port0"
+  # Servo types
+  servo_types: ["XC330_T288_T", "XM430_W210_T", "XC330_T288_T", "XM430_W210_T", "XC330_T288_T",
+    "XC330_T288_T", "XC330_T288_T", "XC330_T288_T"]
+  # Servo joint directions to match that of the leader arm
+  joint_signs: [1, 1, 1, -1, 1, -1, 1, -1]
+  # [J1..J7, Gripper] rad, test_06 calibration 后写入
+  joint_offsets: [3.141593, 2.356194, 3.141593, 2.159845, 3.141593, 4.712389, 
+      4.712389, 3.819612]
+
+mujoco:
+  model_path: "mujoco_menagerie/franka_fr3/scene.xml"
+  sim_steps_per_control: 1
+
+arm_teleop:
+  # URDF used for creating leader arm dynamics model to compute gravity compensation
+  leader_urdf: "factr_teleop_franka.urdf"
+  num_arm_joints: 7
+  arm_joint_limits_max: [2.7437, 1.7837, 2.9007, -0.1518, 2.8065, 4.5169, 3.0159]
+  arm_joint_limits_min: [-2.7437, -1.7837, -2.9007, -3.0421, -2.8065, 0.5445, 
+      -3.0159]
+  arm_joint_limits_safety_margin: 0.1
+  initialization:
+    # The expected leader arm joint position before launching the script
+    calibration_joint_pos: [0.0, -0.7854, 0.0, -2.356, 0.0, 1.57, 0.0]
+    # The leader arm must be brought to this joint position before the follower starts mirroring the leader
+    # Franka 默认姿态: 0, -π/4, 0, -3π/4, 0, π/2, π/4
+    initial_match_joint_pos: [0.0, -0.7854, 0.0, -2.356, 0.0, 1.5708, 0.7854]
+
+gripper_teleop:
+  # The maximum range (in rad) of the leader gripper trigger
+  actuation_range: 0.8
+
+controller:
+  frequency: 500
+  torque_feedback:
+    enable: false
+    gain: 3.0
+    damping: 0.0
+    motor_scalar: 94.5652173913
+  gravity_comp:
+    enable: true
+    gain: 0.85
+  null_space_regulation:
+    null_space_joint_target: [0.0, -0.7854, 0.0, -2.356, 0.0, 1.5708, 0.7854, 0.0]
+    kp: 0.1
+    kd: 0.01
+  static_friction_comp:
+    enable_speed: 0.9
+    gain: 0.6
+  joint_limit_barrier:
+    kp: 1.03561658022
+    kd: 0.04315069084
+  joint_position_control:
+    interpolation_step_size: 0.5
+    kp: 1.03561658022
+    kd: 0.04315069084
+  gripper_feedback:
+    enable: false
+    gain: 0.28328611898
+    ema_beta: 0.95
+

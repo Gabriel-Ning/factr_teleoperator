@@ -1,0 +1,5 @@
+# FTDI USB-serial for Dynamixel leader arm (FACTR teleop)
+# idVendor 0403, idProduct 6014 = FTDI FT232H; adjust ATTRS{serial} to match your device.
+# List serial: ls /dev/serial/by-id/
+# After install: reload udev, add user to dialout, then re-plug USB or reboot.
+ACTION=="add", SUBSYSTEM=="tty", KERNEL=="ttyUSB*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", ATTRS{serial}=="FTAO51S3", SYMLINK+="my_ftdi", GROUP="dialout", MODE="0660", RUN+="/bin/sh -c 'echo 1 > /sys/bus/usb-serial/devices/%k/latency_timer'"
